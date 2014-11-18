@@ -58,11 +58,6 @@ class rundeck::params {
 
   $mail_config = {}
 
-  $security_config = {
-    'useHMacRequestTokens' => true,
-    'apiCookieAccess'      => true
-  }
-
   $projects_default_org = ''
   $projects_default_desc = ''
 
@@ -87,8 +82,17 @@ class rundeck::params {
   $rss_enabled = false
 
   $grails_server_url = "http://${::fqdn}:4440"
-  $dataSource_dbCreate = 'update'
-  $dataSource_url = 'jdbc:h2:file:/var/lib/rundeck/data/rundeckdb;MVCC=true'
+  
+  $dataSource_config = {}
+  
+  $dataSource_defaults = {
+    'dbCreate'        => 'update',
+    'url'             => 'jdbc:h2:file:/var/lib/rundeck/data/rundeckdb;MVCC=true',
+    'driverClassName' => '',
+    'username'        => '',
+    'password'        => '',
+    'dialect'         => ''
+  }
 
   $keystore = '/etc/rundeck/ssl/keystore'
   $keystore_password = 'adminadmin'

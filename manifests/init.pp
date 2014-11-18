@@ -13,14 +13,14 @@
 #
 # === Parameters
 #
-# [*package_ensure*]
-#   Ensure the state of the rundeck package, either present, absent or a specific version
+# [*package_version*]
+#   The version of rundeck to be installed
 #
 # [*jre_name*]
 #   The name of the jre to be installed if using a custom jre.
 #
-# [*jre_ensure*]
-#   Ensure the version of jre to be installed, either present, absent or a specific version
+# [*jre_version*]
+#   The version of the jre to be installed if using a custom jre.
 #
 # [*auth_type*]
 #   The method used to authenticate to rundeck. Default is file.
@@ -58,12 +58,6 @@
 # [*grails_server_url*]
 #  The url used in sending email notifications.
 #
-# [*dataSource_dbCreate*]
-#  Configuration setting for how the database schema is updated. Defaults to update.
-#
-# [*dataSource_url*]
-#  The jdbc url for the database.
-#
 # [*keystore*]
 #  Full path to the java keystore to be used by Rundeck.
 #
@@ -82,12 +76,6 @@
 # [*service_name*]
 #  The name of the rundeck service.
 #
-# [*mail_config*]
-#  A hash of the notification email configuraton.
-#
-# [*security_config*]
-#  A hash of the rundeck security configuration.
-#
 # === Examples
 #
 # Installing rundeck with a custom jre:
@@ -98,10 +86,11 @@
 # }
 #
 class rundeck (
-  $package_ensure        = $rundeck::params::package_ensure,
+  $package_version       = $rundeck::params::package_version,
   $package_source        = $rundeck::params::package_source,
+  $package_ensure        = $rundeck::params::package_ensure,
   $jre_name              = $rundeck::params::jre_name,
-  $jre_ensure            = $rundeck::params::jre_ensure,
+  $jre_version           = $rundeck::params::jre_version,
   $auth_type             = $rundeck::params::auth_type,
   $auth_users            = $rundeck::params::auth_users,
   $service_logs_dir      = $rundeck::params::service_logs_dir,
@@ -109,25 +98,25 @@ class rundeck (
   $framework_config      = $rundeck::params::framework_config,
   $projects_organization = $rundeck::params::projects_default_org,
   $projects_description  = $rundeck::params::projects_default_desc,
+  $projects_organization = $rundeck::params::projects_default_org,
+  $projects_description  = $rundeck::params::projects_default_desc,
   $rd_loglevel           = $rundeck::params::loglevel,
   $rss_enabled           = $rundeck::params::rss_enabled,
   $grails_server_url     = $rundeck::params::grails_server_url,
-  $dataSource_dbCreate   = $rundeck::params::dataSource_dbCreate,
-  $dataSource_url        = $rundeck::params::dataSource_url,
+  $dataSource_config     = $rundeck::params::dataSource_config,
   $keystore              = $rundeck::params::keystore,
   $keystore_password     = $rundeck::params::keystore_password,
   $key_password          = $rundeck::params::key_password,
   $truststore            = $rundeck::params::truststore,
   $truststore_password   = $rundeck::params::truststore_password,
   $service_name          = $rundeck::params::service_name,
-  $mail_config           = $rundeck::params::mail_config,
-  $security_config       = $rundeck::params::security_config
+  $mail_config           = $rundeck::params::mail_config
+
 ) inherits rundeck::params {
 
-  #validate_re($package_ensure, '\d+\.\d+\.\d+')
-
+  validate_re($package_version, '\d+\.\d+\.\d+')
   validate_string($jre_name)
-  validate_string($jre_ensure)
+  validate_string($jre_version)
   validate_re($auth_type, ['^file$', '^ldap$'])
   validate_hash($auth_users)
   validate_bool($ssl_enabled)
@@ -137,8 +126,8 @@ class rundeck (
   validate_re($rd_loglevel, ['^ALL$', '^DEBUG$', '^ERROR$', '^FATAL$', '^INFO$', '^OFF$', '^TRACE$', '^WARN$'])
   validate_bool($rss_enabled)
   validate_string($grails_server_url)
-  validate_string($dataSource_dbCreate)
-  validate_string($dataSource_url)
+  validate_hash($dataSource_config)
+  validate_absolute_path($keystore)
   validate_absolute_path($keystore)
   validate_string($keystore_password)
   validate_string($key_password)
