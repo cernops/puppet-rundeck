@@ -123,6 +123,21 @@ class rundeck (
   $mail_config           = $rundeck::params::mail_config,
   $security_config       = $rundeck::params::security_config,
   $manage_yum_repo       = $rundeck::params::manage_yum_repo,
+  $ldap_server                = $rundeck::params::ldap_server,
+  $ldap_port                  = $rundeck::params::ldap_port,
+  $ldap_force_binding         = $rundeck::params::ldap_force_binding,
+  $ldap_bind_dn               = $rundeck::params::ldap_bind_dn,
+  $ldap_bind_password         = $rundeck::params::ldap_bind_password,
+  $ldap_user_object_class     = $rundeck::params::ldap_user_object_class,
+  $ldap_user_base_dn          = $rundeck::params::ldap_user_base_dn,
+  $ldap_user_rdn_attribute    = $rundeck::params::ldap_user_rdn_attribute,
+  $ldap_user_id_attribute     = $rundeck::params::ldap_user_id_attribute,
+  $ldap_role_object_class     = $rundeck::params::ldap_role_object_class,
+  $ldap_role_base_dn          = $rundeck::params::ldap_role_base_dn,
+  $ldap_role_name_attribute   = $rundeck::params::ldap_role_name_attribute,
+  $ldap_role_member_attribute = $rundeck::params::ldap_role_member_attribute,
+  $ldap_template_name         = $rundeck::params::ldap_template_name,
+  $ldap_supplemental_roles    = $rundeck::params::ldap_supplemental_roles,
 ) inherits rundeck::params {
 
   #validate_re($package_ensure, '\d+\.\d+\.\d+')
