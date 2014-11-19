@@ -18,13 +18,16 @@ class rundeck::config(
   $rd_loglevel           = $rundeck::rd_loglevel,
   $rss_enabled           = $rundeck::rss_enabled,
   $grails_server_url     = $rundeck::grails_server_url,
-  $dataSource_config     = $rundeck::dataSource_config,
+  $dataSource_dbCreate   = $rundeck::dataSource_dbCreate,
+  $dataSource_url        = $rundeck::dataSource_url,
   $keystore              = $rundeck::keystore,
   $keystore_password     = $rundeck::keystore_password,
   $key_password          = $rundeck::key_password,
   $truststore            = $rundeck::truststore,
   $truststore_password   = $rundeck::truststore_password,
   $service_logs_dir      = $rundeck::service_logs_dir,
+  $mail_config           = $rundeck::mail_config,
+  $security_config       = $rundeck::security_config
 ) inherits rundeck::params {
 
   $framework_properties = merge($rundeck::params::framework_defaults, $framework_config)
@@ -37,7 +40,9 @@ class rundeck::config(
   $properties_dir = $framework_properties['framework.etc.dir']
 
   ensure_resource('file', $properties_dir, {'ensure' => 'directory', 'owner' => $user, 'group' => $group} )
-  
+
+
+
   if $auth_type == 'file' {
     file { "${properties_dir}/jaas-loginmodule.conf":
       owner   => $user,
