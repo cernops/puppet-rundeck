@@ -88,6 +88,8 @@ class rundeck::params {
 
   $grails_server_url = "http://${::fqdn}:4440"
   
+  $dataSource_config = {}
+  
   $dataSource_defaults = {
     'dbCreate'        => 'update',
     'url'             => 'jdbc:h2:file:/var/lib/rundeck/data/rundeckdb;MVCC=true',
@@ -96,6 +98,7 @@ class rundeck::params {
     'password'        => '',
     'dialect'         => ''
   }
+  
   $keystore = '/etc/rundeck/ssl/keystore'
   $keystore_password = 'adminadmin'
   $key_password = 'adminadmin'
