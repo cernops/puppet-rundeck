@@ -58,11 +58,8 @@
 # [*grails_server_url*]
 #  The url used in sending email notifications.
 #
-# [*dataSource_dbCreate*]
-#  Configuration setting for how the database schema is updated. Defaults to update.
-#
-# [*dataSource_url*]
-#  The jdbc url for the database.
+# [*dataSource_config*]
+#  A hash of the data source configuration.
 #
 # [*keystore*]
 #  Full path to the java keystore to be used by Rundeck.
@@ -112,8 +109,7 @@ class rundeck (
   $rd_loglevel           = $rundeck::params::loglevel,
   $rss_enabled           = $rundeck::params::rss_enabled,
   $grails_server_url     = $rundeck::params::grails_server_url,
-  $dataSource_dbCreate   = $rundeck::params::dataSource_dbCreate,
-  $dataSource_url        = $rundeck::params::dataSource_url,
+  $dataSource_config     = $rundeck::params::dataSource_config,  
   $keystore              = $rundeck::params::keystore,
   $keystore_password     = $rundeck::params::keystore_password,
   $key_password          = $rundeck::params::key_password,
@@ -137,8 +133,7 @@ class rundeck (
   validate_re($rd_loglevel, ['^ALL$', '^DEBUG$', '^ERROR$', '^FATAL$', '^INFO$', '^OFF$', '^TRACE$', '^WARN$'])
   validate_bool($rss_enabled)
   validate_string($grails_server_url)
-  validate_string($dataSource_dbCreate)
-  validate_string($dataSource_url)
+  validate_hash($dataSource_config)  
   validate_absolute_path($keystore)
   validate_string($keystore_password)
   validate_string($key_password)

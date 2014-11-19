@@ -11,8 +11,7 @@ class rundeck::config::global::rundeck_config(
   $rdeck_base          = $rundeck::config::rdeck_base,
   $rss_enabled         = $rundeck::config::rss_enabled,
   $grails_server_url   = $rundeck::config::grails_server_url,
-  $dataSource_dbCreate = $rundeck::config::dataSource_dbCreate,
-  $dataSource_url      = $rundeck::config::dataSource_url,
+  $dataSource_config   = $rundeck::config::dataSource_config,  
   $properties_dir      = $rundeck::config::properties_dir,
   $user                = $rundeck::config::user,
   $group               = $rundeck::config::group,
@@ -23,6 +22,8 @@ class rundeck::config::global::rundeck_config(
   $properties_file = "${properties_dir}/rundeck-config.groovy"
 
   ensure_resource('file', $properties_dir, {'ensure' => 'directory', 'owner' => $user, 'group' => $group} )
+
+  $dataSource_properties = merge($rundeck::params::dataSource_defaults, $dataSource_config)
 
   file { "${properties_dir}/rundeck-config.properties":
     ensure => absent
