@@ -76,11 +76,8 @@ Boolean value if set to true enables RSS feeds that are public (non-authenticate
 #####`grails_server_url`
 The url used in sending email notifications.
 
-#####`dataSource_dbCreate`
-Configuration setting for how the database schema is updated. Defaults to update.
-
-#####`dataSource_url`
-The jdbc url for the database.
+#####`dataSource_config`
+A hash of the data Source configuraton.
 
 #####`keystore`
 Full path to the java keystore to be used by Rundeck.
