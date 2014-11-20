@@ -33,21 +33,28 @@ class rundeck::install(
         }
       }
 
-      ensure_resource('package', "rundeck", {'ensure' => $package_ensure} )
+      ensure_resource('package', 'rundeck', {'ensure' => $package_ensure} )
     }
     'Debian': {
 
       $version = inline_template("<% package_version = '${package_ensure}' %><%= package_version.split('-')[0] %>")
 
-      exec { 'download rundeck package':
-        command => "/usr/bin/wget ${package_source}/rundeck-${package_ensure}.deb -O /tmp/rundeck-${package_ensure}.deb",
-        unless  => "/usr/bin/test -f /tmp/rundeck-${package_ensure}.deb"
-      }
+      if $::rundeck_version != $version {
+        exec { 'download rundeck package':
+          command => "/usr/bin/wget ${package_source}/rundeck-${package_ensure}.deb -O /tmp/rundeck-${package_ensure}.deb",
+          unless  => "/usr/bin/test -f /tmp/rundeck-${package_ensure}.deb"
+        }
 
-      exec { 'install rundeck package':
-        command => "/usr/bin/dpkg --force-confold -i /tmp/rundeck-${package_ensure}.deb",
-        unless  => "/usr/bin/dpkg -l | grep rundeck | grep ${version}",
-        require => [ Exec['download rundeck package'], Package[$jre_name] ]
+        exec { 'stop rundeck service':
+          command => '/usr/sbin/service rundeckd stop',
+          unless  => "/bin/bash -c 'if ps ax | grep -v grep | grep RunServer > /dev/null; then echo 1; else echo 0; fi'"
+        }
+
+        exec { 'install rundeck package':
+          command => "/usr/bin/dpkg --force-confold -i /tmp/rundeck-${package_ensure}.deb",
+          unless  => "/usr/bin/dpkg -l | grep rundeck | grep ${version}",
+          require => [ Exec['download rundeck package'], Exec['stop rundeck service'], Package[$jre_name] ]
+        }
       }
 
     }

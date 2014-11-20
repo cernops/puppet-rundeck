@@ -106,54 +106,6 @@ A hash of the rundeck security configuration.
 #####`manage_yum_repo`
 Whether to manage the YUM repository containing the Rundeck rpm. Defaults to true.
 
-#####`ldap_server`
-The address of the ldap server.
-
-#####`ldap_port`
-The port of the ldap server. Deafult 389.
-
-#####`ldap_force_binding`
-Switches Rundeck's force binding login option. Default false.
-
-#####`ldap_bind_dn`
-The root DN that should bind to the ldap server.
-
-#####`ldap_bind_password`
-The password for the above root DN.
-
-#####`ldap_user_object_class`
-Attribute name for user object class. Deafult 'user'.
-
-#####`ldap_user_base_dn`
-Base DN to search for users.
-
-#####`ldap_user_rdn_attribute`
-Attribute name for username. Default 'sAMAccountName'.
-
-#####`ldap_user_id_attribute`
-Attribute name for user id. Deafult 'sAMAccountName'
-
-#####`ldap_role_object_class`
-Attribute name for group object class. Deafult 'group'.
-
-#####`ldap_role_base_dn`
-Base DN for role membership search.
-
-#####`ldap_role_name_attribute`
-Attribute name for username. Default 'cn'.
-
-#####`ldap_role_member_attribute`
-Attribute name for a role that would contain a user's DN. Deafult 'member'.
-
-#####`ldap_template_name`
-The template you want to use for the ldap config file. Deafult 'rundeck/jaas-ldaploginmodule.conf.erb', the module's own template.
-
-#####`ldap_supplemental_roles`
-Comma-separated list of role names. These roles well be added to authenticated users. Deafult 'user'.
-
-#####`ldap_nested_groups`
-If true, will resolve all nested groups for authenticated users. Deafult true.
-
 ####Define: `rundeck::plugin`
 A definition for installing rundeck plugins
 

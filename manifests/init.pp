@@ -58,9 +58,6 @@
 # [*grails_server_url*]
 #  The url used in sending email notifications.
 #
-# [*dataSource_config*]
-#  A hash of the data source configuration.
-#
 # [*keystore*]
 #  Full path to the java keystore to be used by Rundeck.
 #
@@ -109,32 +106,20 @@ class rundeck (
   $rd_loglevel           = $rundeck::params::loglevel,
   $rss_enabled           = $rundeck::params::rss_enabled,
   $grails_server_url     = $rundeck::params::grails_server_url,
-  $dataSource_config     = $rundeck::params::dataSource_config,  
+  $dataSource_config     = $rundeck::params::dataSource_config,
   $keystore              = $rundeck::params::keystore,
   $keystore_password     = $rundeck::params::keystore_password,
   $key_password          = $rundeck::params::key_password,
   $truststore            = $rundeck::params::truststore,
   $truststore_password   = $rundeck::params::truststore_password,
   $service_name          = $rundeck::params::service_name,
+  $service_manage        = $rundeck::params::service_manage,
+  $service_script        = $rundeck::params::service_script,
+  $service_config        = $rundeck::params::service_config,
   $mail_config           = $rundeck::params::mail_config,
   $security_config       = $rundeck::params::security_config,
   $manage_yum_repo       = $rundeck::params::manage_yum_repo,
-  $ldap_server                = $rundeck::params::ldap_server,
-  $ldap_port                  = $rundeck::params::ldap_port,
-  $ldap_force_binding         = $rundeck::params::ldap_force_binding,
-  $ldap_bind_dn               = $rundeck::params::ldap_bind_dn,
-  $ldap_bind_password         = $rundeck::params::ldap_bind_password,
-  $ldap_user_object_class     = $rundeck::params::ldap_user_object_class,
-  $ldap_user_base_dn          = $rundeck::params::ldap_user_base_dn,
-  $ldap_user_rdn_attribute    = $rundeck::params::ldap_user_rdn_attribute,
-  $ldap_user_id_attribute     = $rundeck::params::ldap_user_id_attribute,
-  $ldap_role_object_class     = $rundeck::params::ldap_role_object_class,
-  $ldap_role_base_dn          = $rundeck::params::ldap_role_base_dn,
-  $ldap_role_name_attribute   = $rundeck::params::ldap_role_name_attribute,
-  $ldap_role_member_attribute = $rundeck::params::ldap_role_member_attribute,
-  $ldap_template_name         = $rundeck::params::ldap_template_name,
-  $ldap_supplemental_roles    = $rundeck::params::ldap_supplemental_roles,
-  $ldap_nested_groups         = $rundeck::params::ldap_nested_groups,
+  $ldap_config           = $rundeck::params::ldap_config
 ) inherits rundeck::params {
 
   #validate_re($package_ensure, '\d+\.\d+\.\d+')
@@ -150,7 +135,8 @@ class rundeck (
   validate_re($rd_loglevel, ['^ALL$', '^DEBUG$', '^ERROR$', '^FATAL$', '^INFO$', '^OFF$', '^TRACE$', '^WARN$'])
   validate_bool($rss_enabled)
   validate_string($grails_server_url)
-  validate_hash($dataSource_config)  
+  validate_hash($dataSource_config)
+  validate_absolute_path($keystore)
   validate_absolute_path($keystore)
   validate_string($keystore_password)
   validate_string($key_password)

@@ -7,42 +7,29 @@
 # This private class is called from `rundeck` to manage the configuration
 #
 class rundeck::config(
-  $auth_type                  = $rundeck::auth_type,
-  $auth_users                 = $rundeck::auth_users,
-  $user                       = $rundeck::user,
-  $group                      = $rundeck::group,
-  $ssl_enabled                = $rundeck::ssl_enabled,
-  $framework_config           = $rundeck::framework_config,
-  $projects_organization      = $rundeck::projects_default_org,
-  $projects_description       = $rundeck::projects_default_desc,
-  $rd_loglevel                = $rundeck::rd_loglevel,
-  $rss_enabled                = $rundeck::rss_enabled,
-  $grails_server_url          = $rundeck::grails_server_url,
-  $dataSource_config          = $rundeck::dataSource_config,
-  $keystore                   = $rundeck::keystore,
-  $keystore_password          = $rundeck::keystore_password,
-  $key_password               = $rundeck::key_password,
-  $truststore                 = $rundeck::truststore,
-  $truststore_password        = $rundeck::truststore_password,
-  $service_logs_dir           = $rundeck::service_logs_dir,
-  $mail_config                = $rundeck::mail_config,
-  $security_config            = $rundeck::security_config,
-  $ldap_server                = $rundeck::ldap_server,
-  $ldap_port                  = $rundeck::ldap_port,
-  $ldap_force_binding         = $rundeck::ldap_force_binding,
-  $ldap_bind_dn               = $rundeck::ldap_bind_dn,
-  $ldap_bind_password         = $rundeck::ldap_bind_password,
-  $ldap_user_object_class     = $rundeck::ldap_user_object_class,
-  $ldap_user_base_dn          = $rundeck::ldap_user_base_dn,
-  $ldap_user_rdn_attribute    = $rundeck::ldap_user_rdn_attribute,
-  $ldap_user_id_attribute     = $rundeck::ldap_user_id_attribute,
-  $ldap_role_object_class     = $rundeck::ldap_role_object_class,
-  $ldap_role_base_dn          = $rundeck::ldap_role_base_dn,
-  $ldap_role_name_attribute   = $rundeck::ldap_role_name_attribute,
-  $ldap_role_member_attribute = $rundeck::ldap_role_member_attribute,
-  $ldap_template_name         = $rundeck::ldap_template_name,
-  $ldap_supplemental_roles    = $rundeck::ldap_supplemental_roles,
-  $ldap_nested_groups         = $rundeck::ldap_nested_groups,
+<<<<<<< HEAD
+  $auth_type             = $rundeck::auth_type,
+  $auth_users            = $rundeck::auth_users,
+  $user                  = $rundeck::user,
+  $group                 = $rundeck::group,
+  $ssl_enabled           = $rundeck::ssl_enabled,
+  $framework_config      = $rundeck::framework_config,
+  $projects_organization = $rundeck::projects_default_org,
+  $projects_description  = $rundeck::projects_default_desc,
+  $rd_loglevel           = $rundeck::rd_loglevel,
+  $rss_enabled           = $rundeck::rss_enabled,
+  $grails_server_url     = $rundeck::grails_server_url,
+  $dataSource_config     = $rundeck::dataSource_config,
+  $keystore              = $rundeck::keystore,
+  $keystore_password     = $rundeck::keystore_password,
+  $key_password          = $rundeck::key_password,
+  $truststore            = $rundeck::truststore,
+  $truststore_password   = $rundeck::truststore_password,
+  $service_logs_dir      = $rundeck::service_logs_dir,
+  $service_name          = $rundeck::service_name,
+  $mail_config           = $rundeck::mail_config,
+  $security_config       = $rundeck::security_config,
+  $ldap_config           = $rundeck::ldap_config
 ) inherits rundeck::params {
 
   $framework_properties = merge($rundeck::params::framework_defaults, $framework_config)
@@ -56,15 +43,14 @@ class rundeck::config(
 
   ensure_resource('file', $properties_dir, {'ensure' => 'directory', 'owner' => $user, 'group' => $group} )
 
-
-
   if $auth_type == 'file' {
     file { "${properties_dir}/jaas-loginmodule.conf":
       owner   => $user,
       group   => $group,
       mode    => '0640',
       content => template('rundeck/jaas-loginmodule.conf.erb'),
-      require => File[$properties_dir]
+      require => File[$properties_dir],
+      notify  => Service[$service_name],
     }
 
     file { "${properties_dir}/realm.properties":
@@ -72,7 +58,8 @@ class rundeck::config(
       group   => $group,
       mode    => '0640',
       content => template('rundeck/realm.properties.erb'),
-      require => File[$properties_dir]
+      require => File[$properties_dir],
+      notify  => Service[$service_name],
     }
   }
   elsif $auth_type == 'ldap' {
@@ -90,6 +77,7 @@ class rundeck::config(
     group   => $group,
     mode    => '0640',
     content => template('rundeck/log4j.properties.erb'),
+    notify  => Service[$service_name],
     require => File[$properties_dir]
   }
 
@@ -114,7 +102,18 @@ class rundeck::config(
     group   => $group,
     mode    => '0640',
     content => template('rundeck/profile.erb'),
+    notify  => Service[$service_name],
     require => File[$properties_dir]
+  }
+
+  ensure_resource('file', ['/etc/facter', '/etc/facter/facts.d'], {'ensure' => 'directory'})
+
+  file { '/etc/facter/facts.d/rundeck_version':
+    ensure => present,
+    source => 'puppet:///modules/rundeck/rundeck_version',
+    owner  => root,
+    group  => root,
+    mode   => '0755'
   }
 
   class { 'rundeck::config::global::framework': } ->

@@ -18,7 +18,7 @@ describe 'rundeck class' do
     end
 
     describe package('rundeck') do
-      it { should be_installed.with_version('2.0.3') }
+      it { should be_installed }
     end
 
     describe service('rundeckd') do
@@ -42,7 +42,7 @@ describe 'rundeck class' do
     end
 
     describe package('rundeck') do
-      it { should be_installed.with_version('2.0.3-1.14.GA') }
+      it { should be_installed }
     end
 
     describe service('rundeckd') do
@@ -53,11 +53,11 @@ describe 'rundeck class' do
   context 'older package version', :if => fact('osfamily').eql?('Debian') do
     it 'should work with no errors' do
 
-      shell('apt-get -y --purge remove rundeck')
+      puppet('resource', 'package', 'rundeck', 'ensure=absent')
 
       pp = <<-EOS
       class { 'rundeck':
-        package_version => '2.0.0-1-GA'
+        package_ensure => '2.0.0-1-GA'
       }
       EOS
 
@@ -74,11 +74,11 @@ describe 'rundeck class' do
   context 'older package version', :if => fact('osfamily').eql?('RedHat') do
     it 'should work with no errors' do
 
-      shell('yum -y remove rundeck')
+      puppet('resource', 'package', 'rundeck', 'ensure=absent')
 
       pp = <<-EOS
         class { 'rundeck':
-          package_version => '2.0.0-1.8.GA'
+          package_ensure => '2.0.0-1.8.GA'
         }
       EOS
 
@@ -97,7 +97,7 @@ describe 'rundeck class' do
       pp = <<-EOS
       class { 'rundeck':
         jre_name    => 'openjdk-7-jre',
-        jre_version => '7u51-2.4.4-0ubuntu0.12.04.2'
+        jre_ensure  => '7u51-2.4.4-0ubuntu0.12.04.2'
       }
       EOS
 
@@ -112,7 +112,7 @@ describe 'rundeck class' do
       pp = <<-EOS
       class { 'rundeck':
         jre_name    => 'java-1.7.0-openjdk',
-        jre_version => '1.7.0.51-2.4.4.1.el6_5'
+        jre_ensure  => '1.7.0.51-2.4.4.1.el6_5'
       }
       EOS
 
