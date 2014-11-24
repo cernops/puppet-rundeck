@@ -7,9 +7,9 @@
 # This private class is called from `rundeck` to manage the configuration
 #
 class rundeck::config(
-<<<<<<< HEAD
-  $auth_type             = $rundeck::auth_type,
+  $auth_types            = $rundeck::auth_types,
   $auth_users            = $rundeck::auth_users,
+  $auth_template         = $rundeck::auth_template,
   $user                  = $rundeck::user,
   $group                 = $rundeck::group,
   $ssl_enabled           = $rundeck::ssl_enabled,
@@ -18,8 +18,9 @@ class rundeck::config(
   $projects_description  = $rundeck::projects_default_desc,
   $rd_loglevel           = $rundeck::rd_loglevel,
   $rss_enabled           = $rundeck::rss_enabled,
+  $clustermode_enabled   = $rundeck::clustermode_enabled,
   $grails_server_url     = $rundeck::grails_server_url,
-  $dataSource_config     = $rundeck::dataSource_config,
+  $database_config       = $rundeck::database_config,
   $keystore              = $rundeck::keystore,
   $keystore_password     = $rundeck::keystore_password,
   $key_password          = $rundeck::key_password,
@@ -29,10 +30,11 @@ class rundeck::config(
   $service_name          = $rundeck::service_name,
   $mail_config           = $rundeck::mail_config,
   $security_config       = $rundeck::security_config,
-  $ldap_config           = $rundeck::ldap_config
+  $acl_policies          = $rundeck::acl_policies
 ) inherits rundeck::params {
 
   $framework_properties = merge($rundeck::params::framework_defaults, $framework_config)
+  $auth_config          = merge($rundeck::params::auth_config, $rundeck::auth_config)
 
   $logs_dir = $framework_properties['framework.logs.dir']
   $rdeck_base = $framework_properties['rdeck.base']
@@ -43,16 +45,7 @@ class rundeck::config(
 
   ensure_resource('file', $properties_dir, {'ensure' => 'directory', 'owner' => $user, 'group' => $group} )
 
-  if $auth_type == 'file' {
-    file { "${properties_dir}/jaas-loginmodule.conf":
-      owner   => $user,
-      group   => $group,
-      mode    => '0640',
-      content => template('rundeck/jaas-loginmodule.conf.erb'),
-      require => File[$properties_dir],
-      notify  => Service[$service_name],
-    }
-
+  if 'file' in $auth_types {
     file { "${properties_dir}/realm.properties":
       owner   => $user,
       group   => $group,
@@ -62,14 +55,13 @@ class rundeck::config(
       notify  => Service[$service_name],
     }
   }
-  elsif $auth_type == 'ldap' {
-    file { "${properties_dir}/jaas-ldaploginmodule.conf":
-      owner   => $user,
-      group   => $group,
-      mode    => '0640',
-      content => template($ldap_template_name),
-      require => File[$properties_dir]
-    }
+
+  file { "${properties_dir}/jaas-auth.conf":
+    owner   => $user,
+    group   => $group,
+    mode    => '0640',
+    content => template($auth_template),
+    require => File[$properties_dir]
   }
 
   file { "${properties_dir}/log4j.properties":
@@ -85,7 +77,7 @@ class rundeck::config(
     owner   => $user,
     group   => $group,
     mode    => '0640',
-    content => template('rundeck/admin.aclpolicy.erb'),
+    content => template($rundeck::acl_template),
     require => File[$properties_dir]
   }
 

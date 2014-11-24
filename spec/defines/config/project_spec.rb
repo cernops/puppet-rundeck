@@ -7,14 +7,21 @@ describe 'rundeck::config::project', :type => :define do
         projects_dir = '/var/rundeck/projects'
 
         let(:title) { 'test' }
-
-        let(:facts) {{
-          :osfamily => 'Debian'
+        let(:params) {{
+          :framework_config => {
+            'framework.projects.dir' => projects_dir,
+            'framework.ssh.keypath'  => '/var/lib/rundeck/.ssh/id_rsa'
+          },
+          :file_copier_provider => 'jsch-scp',
+          :resource_sources => {},
+          :node_executor_provider => 'jsch-ssh',
+          :user  => 'rundedck',
+          :group => 'rundeck'
         }}
 
-        it { should contain_file(projects_dir).with(
-          'ensure' => 'directory'
-        ) }
+        let(:facts) {{
+          :osfamily => osfamily
+        }}
 
         it { should contain_file("#{projects_dir}/test/var").with(
           'ensure' => 'directory'
@@ -35,7 +42,7 @@ describe 'rundeck::config::project', :type => :define do
         }
 
         project_details.each do |key,value|
-          it { should contain_ini_setting(key).with(
+          it { should contain_ini_setting("test::#{key}").with(
             'path'    => '/var/rundeck/projects/test/etc/project.properties',
             'setting' => key,
             'value'   => value

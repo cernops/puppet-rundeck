@@ -35,13 +35,95 @@ class rundeck::params {
   $service_script = ''
 
   $rdeck_base = '/var/lib/rundeck'
+  $rdeck_home = '/var/rundeck'
   $service_logs_dir = '/var/log/rundeck'
 
-  $auth_type = 'file'
+  $auth_types = ['file']
   $auth_users = {}
+  $auth_template = 'rundeck/jaas-auth.conf.erb'
 
+  $acl_template = 'rundeck/admin.aclpolicy.erb'
+
+  $acl_policies = [
+    {
+      'description' => 'Admin, all access',
+      'context' => {
+        'type' => 'project',
+        'rule' => '.*'
+      },
+      'resource_types' => [
+        { 'type'  => 'resource', 'rules' => [{'name' => 'allow','rule' => '.*'}] },
+        { 'type'  => 'adhoc', 'rules' => [{'name' => 'allow','rule' => '.*'}] },
+        { 'type'  => 'job', 'rules' => [{'name' => 'allow','rule' => '.*'}] },
+        { 'type'  => 'node', 'rules' => [{'name' => 'allow','rule' => '.*'}] }
+      ],
+      'by' => {
+        'groups'    => ['admin'],
+        'usernames' => undef
+      }
+    },
+    {
+      'description' => 'Admin, all access',
+      'context' => {
+        'type' => 'application',
+        'rule' => 'rundeck'
+      },
+      'resource_types' => [
+        { 'type'  => 'resource', 'rules' => [{'name' => 'allow','rule' => '.*'}] },
+        { 'type'  => 'project', 'rules' => [{'name' => 'allow','rule' => '.*'}] },
+      ],
+      'by' => {
+        'groups'    => ['admin'],
+        'usernames' => undef
+      }
+    }
+  ]
+
+  $auth_config = {
+    'file' => {
+      'file' => '/etc/rundeck/realm.properties'
+    },
+    'ldap' => {
+      'server'                  => undef,
+      'port'                    => '389',
+      'force_binding'           => false,
+      'force_binding_use_root'  => false,
+      'bind_dn'                 => undef,
+      'bind_password'           => undef,
+      'user_base_dn'            => undef,
+      'user_rdn_attribute'      => 'uid',
+      'user_id_attribute'       => 'uid',
+      'user_password_attribute' => 'userPassword',
+      'user_object_class'       => 'user',
+      'role_base_dn'            => undef,
+      'role_name_attribute'     => 'cn',
+      'role_member_attribute'   => 'memberUid',
+      'role_object_class'       => 'group',
+      'nested_groups'           => true
+    },
+    'active_directory' => {
+      'server'                  => undef,
+      'port'                    => '389',
+      'force_binding'           => true,
+      'force_binding_use_root'  => true,
+      'bind_dn'                 => undef,
+      'bind_password'           => undef,
+      'user_base_dn'            => undef,
+      'user_rdn_attribute'      => 'sAMAccountName',
+      'user_id_attribute'       => 'sAMAccountName',
+      'user_password_attribute' => 'unicodePwd',
+      'user_object_class'       => 'user',
+      'role_base_dn'            => undef,
+      'role_name_attribute'     => 'cn',
+      'role_member_attribute'   => 'member',
+      'role_object_class'       => 'group',
+      'supplemental_roles'      => 'user',
+      'nested_groups'           => true
+    }
+  }
+
+  #TODO:
   $framework_config = {}
-
   $framework_defaults = {
     'framework.server.name'     => $::fqdn,
     'framework.server.hostname' => $::fqdn,
@@ -58,7 +140,8 @@ class rundeck::params {
     'framework.libext.dir'      => '/var/lib/rundeck/libext',
     'framework.ssh.keypath'     => '/var/lib/rundeck/.ssh/id_rsa',
     'framework.ssh.user'        => 'rundeck',
-    'framework.ssh.timeout'     => '0'
+    'framework.ssh.timeout'     => '0',
+    'rundeck.server.uuid'       => $::serialnumber,
   }
 
   $mail_config = {}
@@ -91,11 +174,12 @@ class rundeck::params {
   $loglevel = 'INFO'
   $rss_enabled = false
 
+  $clustermode_enabled = false
+
   $grails_server_url = "http://${::fqdn}:4440"
 
-  $dataSource_config = {}
-
-  $dataSource_defaults = {
+  $database_config = {
+    'type'            => 'h2',
     'dbCreate'        => 'update',
     'url'             => 'jdbc:h2:file:/var/lib/rundeck/data/rundeckdb;MVCC=true',
     'driverClassName' => '',
@@ -118,23 +202,4 @@ class rundeck::params {
   $ssl_port = '4443'
 
   $package_source = 'http://dl.bintray.com/rundeck/rundeck-deb'
-
-  $ldap_config = {
-    'server'                => undef,
-    'port'                  => '389',
-    'force_binding'         => false,
-    'bind_dn'               => undef,
-    'bind_password'         => undef,
-    'user_object_class'     => 'user',
-    'user_base_dn'          => undef,
-    'user_rdn_attribute'    => 'sAMAccountName',
-    'user_id_attribute'     => 'sAMAccountName',
-    'role_object_clas'      => 'group',
-    'role_base_dn'          => undef,
-    'role_name_attribute'   => 'cn',
-    'role_member_attribute' => 'member',
-    'template_name'         => 'rundeck/jaas-ldaploginmodule.conf.erb',
-    'supplemental_roles'    => 'user',
-    'nested_groups'         => true
-  }
 }
