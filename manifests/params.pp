@@ -16,6 +16,7 @@ class rundeck::params {
       $service_name = 'rundeckd'
       $jre_name = 'openjdk-6-jre'
       $jre_ensure = 'installed'
+      $manage_yum_repo = false
     }
     'RedHat', 'Amazon': {
       $package_name = 'rundeck'
@@ -37,6 +38,26 @@ class rundeck::params {
   $rdeck_base = '/var/lib/rundeck'
   $rdeck_home = '/var/rundeck'
   $service_logs_dir = '/var/log/rundeck'
+
+  $framework_config = {
+    'framework.server.name'     => $::fqdn,
+    'framework.server.hostname' => $::fqdn,
+    'framework.server.port'     => '4440',
+    'framework.server.url'      => "http://${::fqdn}:4440",
+    'framework.server.username' => 'admin',
+    'framework.server.password' => 'admin',
+    'rdeck.base'                => '/var/lib/rundeck',
+    'framework.projects.dir'    => '/var/rundeck/projects',
+    'framework.etc.dir'         => '/etc/rundeck',
+    'framework.var.dir'         => '/var/lib/rundeck/var',
+    'framework.tmp.dir'         => '/var/lib/rundeck/var/tmp',
+    'framework.logs.dir'        => '/var/lib/rundeck/logs',
+    'framework.libext.dir'      => '/var/lib/rundeck/libext',
+    'framework.ssh.keypath'     => '/var/lib/rundeck/.ssh/id_rsa',
+    'framework.ssh.user'        => 'rundeck',
+    'framework.ssh.timeout'     => '0',
+    'rundeck.server.uuid'       => $::serialnumber,
+  }
 
   $auth_types = ['file']
   $auth_users = {}
@@ -81,7 +102,10 @@ class rundeck::params {
 
   $auth_config = {
     'file' => {
-      'file' => '/etc/rundeck/realm.properties'
+      'admin_user'     => $framework_config['framework.server.username'],
+      'admin_password' => $framework_config['framework.server.password'],
+      'auth_users'     => {},
+      'file'           => '/etc/rundeck/realm.properties'
     },
     'ldap' => {
       'server'                  => undef,
@@ -120,28 +144,6 @@ class rundeck::params {
       'supplemental_roles'      => 'user',
       'nested_groups'           => true
     }
-  }
-
-  #TODO:
-  $framework_config = {}
-  $framework_defaults = {
-    'framework.server.name'     => $::fqdn,
-    'framework.server.hostname' => $::fqdn,
-    'framework.server.port'     => '4440',
-    'framework.server.url'      => "http://${::fqdn}:4440",
-    'framework.server.username' => 'admin',
-    'framework.server.password' => 'admin',
-    'rdeck.base'                => '/var/lib/rundeck',
-    'framework.projects.dir'    => '/var/rundeck/projects',
-    'framework.etc.dir'         => '/etc/rundeck',
-    'framework.var.dir'         => '/var/lib/rundeck/var',
-    'framework.tmp.dir'         => '/var/lib/rundeck/var/tmp',
-    'framework.logs.dir'        => '/var/lib/rundeck/logs',
-    'framework.libext.dir'      => '/var/lib/rundeck/libext',
-    'framework.ssh.keypath'     => '/var/lib/rundeck/.ssh/id_rsa',
-    'framework.ssh.user'        => 'rundeck',
-    'framework.ssh.timeout'     => '0',
-    'rundeck.server.uuid'       => $::serialnumber,
   }
 
   $mail_config = {}

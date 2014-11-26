@@ -8,12 +8,10 @@
 #
 class rundeck::config(
   $auth_types            = $rundeck::auth_types,
-  $auth_users            = $rundeck::auth_users,
   $auth_template         = $rundeck::auth_template,
   $user                  = $rundeck::user,
   $group                 = $rundeck::group,
   $ssl_enabled           = $rundeck::ssl_enabled,
-  $framework_config      = $rundeck::framework_config,
   $projects_organization = $rundeck::projects_default_org,
   $projects_description  = $rundeck::projects_default_desc,
   $rd_loglevel           = $rundeck::rd_loglevel,
@@ -33,19 +31,18 @@ class rundeck::config(
   $acl_policies          = $rundeck::acl_policies
 ) inherits rundeck::params {
 
-  $framework_properties = merge($rundeck::params::framework_defaults, $framework_config)
-  $auth_config          = deep_merge($rundeck::params::auth_config, $rundeck::auth_config)
+  $framework_config = deep_merge($rundeck::params::framework_config, $rundeck::framework_config)
+  $auth_config      = deep_merge($rundeck::params::auth_config, $rundeck::auth_config)
 
-  $logs_dir = $framework_properties['framework.logs.dir']
-  $rdeck_base = $framework_properties['rdeck.base']
-  $projects_dir = $framework_properties['framework.projects.dir']
-  $admin_user = $framework_properties['framework.server.username']
-  $admin_password = $framework_properties['framework.server.password']
-  $properties_dir = $framework_properties['framework.etc.dir']
+  $logs_dir       = $framework_config['framework.logs.dir']
+  $rdeck_base     = $framework_config['rdeck.base']
+  $projects_dir   = $framework_config['framework.projects.dir']
+  $properties_dir = $framework_config['framework.etc.dir']
 
   ensure_resource('file', $properties_dir, {'ensure' => 'directory', 'owner' => $user, 'group' => $group} )
 
   if 'file' in $auth_types {
+
     file { "${properties_dir}/realm.properties":
       owner   => $user,
       group   => $group,
