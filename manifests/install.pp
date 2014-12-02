@@ -22,9 +22,7 @@ class rundeck::install(
   $framework_config = deep_merge($rundeck::params::framework_config, $rundeck::framework_config)
   $projects_dir = $framework_config['framework.projects.dir']
 
-  if ! defined(Package[$jre_name]) {
-    ensure_resource('package', $jre_name, {'ensure' => $jre_ensure} )
-  }
+  ensure_resource('package', $jre_name, {'ensure' => $jre_ensure} )
 
   $user = $rundeck::user
   $group = $rundeck::group
